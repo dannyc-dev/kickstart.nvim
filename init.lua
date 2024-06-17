@@ -56,8 +56,8 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.list = false
+-- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -142,6 +142,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'glepnir/lspsaga.nvim', -- LSP UI improvements
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -457,7 +458,7 @@ require('lazy').setup({
           -- This may be unwanted, since they displace some of your code
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
             end, '[T]oggle Inlay [H]ints')
           end
         end,
@@ -750,7 +751,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'python' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -777,6 +778,157 @@ require('lazy').setup({
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
+  },
+
+  -- semshi for additional syntax highlighting.
+  -- See the README for Treesitter cs Semshi comparison.
+  -- requires `pynvim` (`python3 -m pip install pynvim`)
+  {
+    'wookayin/semshi', -- maintained fork
+    ft = 'python',
+    build = ':UpdateRemotePlugins', -- don't disable `rplugin` in lazy.nvim for this
+    init = function()
+      vim.g.python3_host_prog = vim.fn.exepath 'python3'
+      -- better done by LSP
+      vim.g['semshi#error_sign'] = false
+      vim.g['semshi#simplify_markup'] = false
+      vim.g['semshi#mark_selected_nodes'] = false
+      vim.g['semshi#update_delay_factor'] = 0.001
+
+      vim.api.nvim_create_autocmd({ 'VimEnter', 'ColorScheme' }, {
+        callback = function()
+          vim.cmd [[
+            highlight! semshiGlobal gui=italic
+            highlight! link semshiImported @lsp.type.namespace
+            highlight! link semshiParameter @lsp.type.parameter
+            highlight! link semshiParameterUnused DiagnosticUnnecessary
+            highlight! link semshiBuiltin @function.builtin
+            highlight! link semshiAttribute @field
+            highlight! link semshiSelf @lsp.type.selfKeyword
+            highlight! link semshiUnresolved @lsp.type.unresolvedReference
+            highlight! link semshiFree @comment
+            ]]
+        end,
+      })
+    end,
+  },
+
+  -----------------------------------------------------------------------------
+  {
+    'nvim-neotest/nvim-nio',
+  },
+  {
+    'rcarriga/nvim-dap-ui',
+    dependencies = 'mfussenegger/nvim-dap',
+    config = function()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
+      dapui.setup()
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close()
+      end
+    end,
+    keys = {
+      {
+        '<leader>du',
+        function()
+          require('dapui').toggle()
+        end,
+        desc = 'Toggle Debugger UI',
+      },
+    },
+  },
+  {
+    'mfussenegger/nvim-dap',
+    keys = {
+      {
+        '<leader>dc',
+        function()
+          require('dap').continue()
+        end,
+        desc = 'Start/Continue Debugger',
+      },
+      {
+        '<leader>db',
+        function()
+          require('dap').toggle_breakpoint()
+        end,
+        desc = 'Add Breakpoint',
+      },
+      {
+        '<leader>dt',
+        function()
+          require('dap').terminate()
+        end,
+        desc = 'Terminate Debugger',
+      },
+      {
+        '<leader>di',
+        function()
+          require('dap').step_into()
+        end,
+        desc = 'Step Into',
+      },
+      {
+        '<leader>dn',
+        function()
+          require('dap').step_over()
+        end,
+        desc = 'Step Over',
+      },
+      {
+        '<leader>do',
+        function()
+          require('dap').step_out()
+        end,
+        desc = 'Step Out',
+      },
+    },
+  },
+  {
+    'mfussenegger/nvim-dap-python',
+    ft = 'python',
+    dependencies = {
+      'mfussenegger/nvim-dap',
+      'rcarriga/nvim-dap-ui',
+      'nvim-neotest/nvim-nio',
+    },
+    config = function()
+      require('dap-python').setup 'python'
+    end,
+  },
+  -----------------------------------------------------------------------------
+  -- EDITING SUPPORT PLUGINS
+  -- some plugins that help with python-specific editing operations
+
+  -- Docstring creation
+  -- - quickly create docstrings via `<leader>a`
+  {
+    'danymat/neogen',
+    opts = { noremap = true, silent = true },
+    keys = {
+      {
+        '<leader>a',
+        function()
+          require('neogen').generate {}
+        end,
+        desc = 'Add Docstring',
+      },
+    },
+  },
+
+  -- f-strings
+  -- - auto-convert strings to f-strings when typing `{}` in a string
+  -- - also auto-converts f-strings back to regular strings when removing `{}`
+  {
+    'chrisgrieser/nvim-puppeteer',
+    dependencies = 'nvim-treesitter/nvim-treesitter',
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -822,6 +974,53 @@ require('lazy').setup({
     },
   },
 })
+
+-- Configure LSP client
+local lspconfig = require 'lspconfig'
+
+-- Setup capabilities for LSP with nvim-cmp
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+-- Configure Pyright
+lspconfig.pyright.setup {
+  capabilities = capabilities,
+}
+
+-- Optional: Configure nvim-cmp for autocompletion
+local cmp = require 'cmp'
+
+cmp.setup {
+  -- snippet = {
+  -- expand = function(args)
+  -- vim.fn['vsnip#anonymous'](args.body) -- For `vsnip` users
+  -- require('luasnip').lsp_expand(args.body)  -- For `luasnip` users
+  -- require('snippy').expand_snippet(args.body)  -- For `snippy` users
+  -- vim.fn["UltiSnips#Anon"](args.body)  -- For `ultisnips` users
+  -- end,
+  -- },
+  mapping = {
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+  },
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    -- { name = 'vsnip' }, -- For `vsnip` users
+    -- { name = 'luasnip' },  -- For `luasnip` users
+    -- { name = 'snippy' },  -- For `snippy` users
+    -- { name = 'ultisnips' },  -- For `ultisnips` users
+  }, {
+    { name = 'buffer' },
+  }),
+}
+
+-- Configure lspsaga for improved LSP UI
+local saga = require 'lspsaga'
+saga.setup {}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
