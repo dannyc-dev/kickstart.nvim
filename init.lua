@@ -722,14 +722,14 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      -- require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- require('mini.surround').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -1000,27 +1000,27 @@ lspconfig.pyright.setup {
 local cmp = require 'cmp'
 
 cmp.setup {
-  -- snippet = {
-  -- expand = function(args)
-  -- vim.fn['vsnip#anonymous'](args.body) -- For `vsnip` users
-  -- require('luasnip').lsp_expand(args.body)  -- For `luasnip` users
-  -- require('snippy').expand_snippet(args.body)  -- For `snippy` users
-  -- vim.fn["UltiSnips#Anon"](args.body)  -- For `ultisnips` users
-  -- end,
-  -- },
+  snippet = {
+    expand = function(args)
+      -- vim.fn['vsnip#anonymous'](args.body) -- For `vsnip` users
+      require('luasnip').lsp_expand(args.body) -- For `luasnip` users
+      -- require('snippy').expand_snippet(args.body)  -- For `snippy` users
+      -- vim.fn["UltiSnips#Anon"](args.body)  -- For `ultisnips` users
+    end,
+  },
   mapping = {
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
+    ['<Tab>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
     ['<CR>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
-    ['<Tab>'] = cmp.mapping.select_next_item(),
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<S-Enter>'] = cmp.mapping.select_next_item(),
   },
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     -- { name = 'vsnip' }, -- For `vsnip` users
-    -- { name = 'luasnip' },  -- For `luasnip` users
+    { name = 'luasnip' }, -- For `luasnip` users
     -- { name = 'snippy' },  -- For `snippy` users
     -- { name = 'ultisnips' },  -- For `ultisnips` users
   }, {
