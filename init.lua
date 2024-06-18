@@ -108,6 +108,15 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<Leader>t', ':botright split | resize 10 | terminal<CR>', { noremap = true, silent = true })
 
+-- Function to copy the current file path to clipboard
+function CopyFilePath()
+  local file_path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', file_path)
+  print('File path copied to clipboard: ' .. file_path)
+end
+-- Map the function to a key combination (e.g., <Leader>cp)
+vim.api.nvim_set_keymap('n', '<Leader>cp', ':lua CopyFilePath()<CR>', { noremap = true, silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -572,7 +581,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'black' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
@@ -941,6 +950,32 @@ require('lazy').setup({
     dependencies = 'nvim-treesitter/nvim-treesitter',
   },
 
+  ------------------------------------------------------------
+  -- Dashboard
+  {
+    'goolord/alpha-nvim',
+    config = function()
+      local alpha = require 'alpha'
+      local dashboard = require 'alpha.themes.dashboard'
+      local builtin = require 'telescope.builtin'
+      dashboard.section.buttons.val = {
+        dashboard.button('e', '📄  New file', ':ene <BAR> startinsert <CR>'),
+        dashboard.button('f', '🚀 Find Files', ':Telescope find_files <CR>'),
+        dashboard.button('q', '❌ Quit NVIM', ':qa<CR>'),
+      }
+      local handle = io.popen 'fortune'
+      local fortune = handle:read '*a'
+      handle:close()
+      dashboard.section.footer.val = fortune
+
+      dashboard.config.opts.noautocmd = true
+
+      vim.cmd [[autocmd User AlphaReady echo 'ready']]
+
+      alpha.setup(dashboard.config)
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1014,7 +1049,7 @@ cmp.setup {
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
     ['<Tab>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
-    ['<CR>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
+    -- ['<CR>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
     ['<S-Enter>'] = cmp.mapping.select_next_item(),
   },
   sources = cmp.config.sources({
