@@ -107,6 +107,8 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<Leader>t', ':botright split | resize 10 | terminal<CR>', { noremap = true, silent = true })
+-- Key binding to save the current document using <leader>w
+vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 
 -- Function to copy the current file path to clipboard
 function CopyFilePath()
@@ -213,7 +215,7 @@ require('lazy').setup({
         ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+        --['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
       }
@@ -417,7 +419,7 @@ require('lazy').setup({
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
-          map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          -- map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
@@ -963,10 +965,6 @@ require('lazy').setup({
         dashboard.button('f', '🚀 Find Files', ':Telescope find_files <CR>'),
         dashboard.button('q', '❌ Quit NVIM', ':qa<CR>'),
       }
-      local handle = io.popen 'fortune'
-      local fortune = handle:read '*a'
-      handle:close()
-      dashboard.section.footer.val = fortune
 
       dashboard.config.opts.noautocmd = true
 
