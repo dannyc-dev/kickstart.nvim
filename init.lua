@@ -1063,7 +1063,13 @@ cmp.setup {
 
 -- Configure lspsaga for improved LSP UI
 local saga = require 'lspsaga'
-saga.setup {}
-
+saga.setup {
+  lightbulb = {
+    enabled = true,
+    sign = true,
+    virtual_text = false,
+    sign_priority = 20,
+  },
+}
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
