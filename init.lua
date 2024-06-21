@@ -106,7 +106,7 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<Leader>t', ':botright split | resize 10 | terminal<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Leader>t', ':botright split | resize 8 | terminal<CR>', { noremap = true, silent = true })
 -- Key binding to save the current document using <leader>w
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 
