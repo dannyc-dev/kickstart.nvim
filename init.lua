@@ -932,9 +932,6 @@ require('lazy').setup({
       'rcarriga/nvim-dap-ui',
       'nvim-neotest/nvim-nio',
     },
-    config = function()
-      require('dap-python').setup 'python'
-    end,
   },
   -----------------------------------------------------------------------------
   -- EDITING SUPPORT PLUGINS
@@ -1083,5 +1080,6 @@ saga.setup {
     sign_priority = 20,
   },
 }
+require 'config.dap-config'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
