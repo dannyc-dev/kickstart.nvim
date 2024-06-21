@@ -215,7 +215,7 @@ require('lazy').setup({
         ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        --['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+        ['<leader>a'] = { name = 'H[A]rpoon Add', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
       }
@@ -231,11 +231,11 @@ require('lazy').setup({
     event = 'VeryLazy',
     ---@type Flash.Config
     opts = {},
-    -- stylua: ignore
-    keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-    },
+  -- stylua: ignore
+  keys = {
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+  },
   },
 
   -- NOTE: Plugins can specify dependencies.
@@ -292,6 +292,22 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
+        defaults = {
+          file_ignore_patterns = {
+            'node_modules',
+            '__pycache__',
+            '.pytest_cache',
+            '%.pyc$',
+            '.direnv',
+            '.git',
+          },
+        },
+
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
@@ -824,16 +840,16 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd({ 'VimEnter', 'ColorScheme' }, {
         callback = function()
           vim.cmd [[
-            highlight! semshiGlobal gui=italic
-            highlight! link semshiImported @lsp.type.namespace
-            highlight! link semshiParameter @lsp.type.parameter
-            highlight! link semshiParameterUnused DiagnosticUnnecessary
-            highlight! link semshiBuiltin @function.builtin
-            highlight! link semshiAttribute @field
-            highlight! link semshiSelf @lsp.type.selfKeyword
-            highlight! link semshiUnresolved @lsp.type.unresolvedReference
-            highlight! link semshiFree @comment
-            ]]
+          highlight! semshiGlobal gui=italic
+          highlight! link semshiImported @lsp.type.namespace
+          highlight! link semshiParameter @lsp.type.parameter
+          highlight! link semshiParameterUnused DiagnosticUnnecessary
+          highlight! link semshiBuiltin @function.builtin
+          highlight! link semshiAttribute @field
+          highlight! link semshiSelf @lsp.type.selfKeyword
+          highlight! link semshiUnresolved @lsp.type.unresolvedReference
+          highlight! link semshiFree @comment
+          ]]
         end,
       })
     end,
@@ -932,28 +948,15 @@ require('lazy').setup({
       'rcarriga/nvim-dap-ui',
       'nvim-neotest/nvim-nio',
     },
-    config = function()
-      require('dap-python').setup 'python'
-    end,
   },
   -----------------------------------------------------------------------------
   -- EDITING SUPPORT PLUGINS
   -- some plugins that help with python-specific editing operations
 
-  -- Docstring creation
-  -- - quickly create docstrings via `<leader>a`
   {
-    'danymat/neogen',
-    opts = { noremap = true, silent = true },
-    keys = {
-      {
-        '<leader>a',
-        function()
-          require('neogen').generate {}
-        end,
-        desc = 'Add Docstring',
-      },
-    },
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
   },
 
   -- f-strings
@@ -1083,5 +1086,37 @@ saga.setup {
     sign_priority = 20,
   },
 }
+
+local harpoon = require 'harpoon'
+harpoon:setup {}
+
+-- basic telescope configuration
+local conf = require('telescope.config').values
+local function toggle_telescope(harpoon_files)
+  local file_paths = {}
+  for _, item in ipairs(harpoon_files.items) do
+    table.insert(file_paths, item.value)
+  end
+
+  require('telescope.pickers')
+    .new({}, {
+      prompt_title = 'Harpoon',
+      finder = require('telescope.finders').new_table {
+        results = file_paths,
+      },
+      previewer = conf.file_previewer {},
+      sorter = conf.generic_sorter {},
+    })
+    :find()
+end
+
+vim.keymap.set('n', '<leader>a', function()
+  harpoon:list():add()
+end)
+vim.keymap.set('n', '<C-e>', function()
+  toggle_telescope(harpoon:list())
+end, { desc = 'Open harpoon window' })
+
+require 'config.dap-config'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
