@@ -512,6 +512,7 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -524,8 +525,19 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        gopls = {},
+        pyright = {
+          capabilities = capabilities,
+          settings = {
+            python = {
+              analysis = {
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                autoImportCompletions = true,
+              },
+            },
+          },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -687,7 +699,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -1032,49 +1044,6 @@ require('lazy').setup({
     },
   },
 })
-
--- Configure LSP client
-local lspconfig = require 'lspconfig'
-
--- Setup capabilities for LSP with nvim-cmp
-local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
--- Configure Pyright
-lspconfig.pyright.setup {
-  capabilities = capabilities,
-}
-
--- Optional: Configure nvim-cmp for autocompletion
-local cmp = require 'cmp'
-
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      -- vim.fn['vsnip#anonymous'](args.body) -- For `vsnip` users
-      require('luasnip').lsp_expand(args.body) -- For `luasnip` users
-      -- require('snippy').expand_snippet(args.body)  -- For `snippy` users
-      -- vim.fn["UltiSnips#Anon"](args.body)  -- For `ultisnips` users
-    end,
-  },
-  mapping = {
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.abort(),
-    ['<Tab>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
-    -- ['<CR>'] = cmp.mapping.confirm { select = true }, -- Accept currently selected item.
-    ['<S-Enter>'] = cmp.mapping.select_next_item(),
-  },
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    -- { name = 'vsnip' }, -- For `vsnip` users
-    { name = 'luasnip' }, -- For `luasnip` users
-    -- { name = 'snippy' },  -- For `snippy` users
-    -- { name = 'ultisnips' },  -- For `ultisnips` users
-  }, {
-    { name = 'buffer' },
-  }),
-}
 
 -- Configure lspsaga for improved LSP UI
 local saga = require 'lspsaga'
