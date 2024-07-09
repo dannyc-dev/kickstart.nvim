@@ -170,6 +170,24 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
+  -- Marks
+  {
+    'chentoast/marks.nvim',
+    config = function()
+      require('marks').setup {
+        highlight_line = true, -- Highlighting of mark lines in sign column
+        limit_marks = 10000, -- Limit the maximum number of marks stored per file
+        cycle = true, -- Enable per-buffer mark tracking
+        persist = false, -- Persist marks across sessions
+        mappings = { -- Keymap customization
+          delete_buf = '<leader>md', -- Clear all marks
+          set = 'm',
+          next = 'gn', -- Jump to next mark
+          preview = '<leader>mp', -- Preview all marks
+        },
+      }
+    end,
+  },
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
   --    require('gitsigns').setup({ ... })
