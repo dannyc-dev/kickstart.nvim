@@ -578,7 +578,6 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         tsserver = {},
-        --
 
         lua_ls = {
           -- cmd = {...},
@@ -594,6 +593,9 @@ require('lazy').setup({
             },
           },
         },
+
+        -- Zig
+        zls = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -837,7 +839,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'python', 'tsx', 'typescript' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'go', 'vim', 'vimdoc', 'python', 'tsx', 'typescript', 'zig' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1047,7 +1049,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
