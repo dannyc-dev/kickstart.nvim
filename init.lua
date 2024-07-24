@@ -168,7 +168,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  -- { 'numToStr/Comment.nvim', opts = {} },
 
   -- Marks
   {
@@ -530,11 +530,11 @@ require('lazy').setup({
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
-            end, '[T]oggle Inlay [H]ints')
-          end
+          -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          --   map('<leader>ih', function()
+          --     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
+          --   end, 'Toggle Inlay [H]ints')
+          -- end
         end,
       })
 
@@ -867,40 +867,6 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-
-  -- semshi for additional syntax highlighting.
-  -- See the README for Treesitter cs Semshi comparison.
-  -- requires `pynvim` (`python3 -m pip install pynvim`)
-  {
-    'wookayin/semshi', -- maintained fork
-    ft = 'python',
-    build = ':UpdateRemotePlugins', -- don't disable `rplugin` in lazy.nvim for this
-    init = function()
-      vim.g.python3_host_prog = vim.fn.exepath 'python3'
-      -- better done by LSP
-      vim.g['semshi#error_sign'] = false
-      vim.g['semshi#simplify_markup'] = false
-      vim.g['semshi#mark_selected_nodes'] = false
-      vim.g['semshi#update_delay_factor'] = 0.001
-
-      vim.api.nvim_create_autocmd({ 'VimEnter', 'ColorScheme' }, {
-        callback = function()
-          vim.cmd [[
-          highlight! semshiGlobal gui=italic
-          highlight! link semshiImported @lsp.type.namespace
-          highlight! link semshiParameter @lsp.type.parameter
-          highlight! link semshiParameterUnused DiagnosticUnnecessary
-          highlight! link semshiBuiltin @function.builtin
-          highlight! link semshiAttribute @field
-          highlight! link semshiSelf @lsp.type.selfKeyword
-          highlight! link semshiUnresolved @lsp.type.unresolvedReference
-          highlight! link semshiFree @comment
-          ]]
-        end,
-      })
-    end,
-  },
-
   -----------------------------------------------------------------------------
   {
     'nvim-neotest/nvim-nio',
@@ -1049,7 +1015,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
