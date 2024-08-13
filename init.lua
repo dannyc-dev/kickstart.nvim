@@ -909,6 +909,20 @@ require('lazy').setup({
         desc = 'Start/Continue Debugger',
       },
       {
+        '<leader>dC',
+        function()
+          require('dap-python').test_class()
+        end,
+        desc = '[D]ebug: test current [c]lass',
+      },
+      {
+        '<leader>dm',
+        function()
+          require('dap-python').test_method()
+        end,
+        desc = '[D]ebug: test current [m]ethod',
+      },
+      {
         '<leader>db',
         function()
           require('dap').toggle_breakpoint()
