@@ -106,7 +106,7 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<Leader>t', ':botright split | resize 8 | terminal<CR>', { noremap = true, silent = true })
+-- vim.keymap.set('n', '<Leader>t', ':botright split | resize 8 | terminal<CR>', { noremap = true, silent = true })
 -- Key binding to save the current document using <leader>w
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 
@@ -1012,6 +1012,24 @@ require('lazy').setup({
       vim.cmd [[autocmd User AlphaReady echo 'ready']]
 
       alpha.setup(dashboard.config)
+    end,
+  },
+
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*', -- Use the latest stable version
+    config = function()
+      require('toggleterm').setup {
+        -- Your toggleterm configuration
+        direction = 'float',
+        float_opts = {
+          border = 'curved',
+          width = 120,
+          height = 30,
+          winblend = 3,
+        },
+        open_mapping = [[<c-/>]], -- Set the keybinding to open the terminal
+      }
     end,
   },
 
