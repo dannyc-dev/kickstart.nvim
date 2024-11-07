@@ -657,7 +657,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'black' },
+        -- python = { 'black' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
@@ -865,6 +865,38 @@ require('lazy').setup({
       --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+    end,
+  },
+  {
+    'rmagatti/goto-preview',
+    lazy = false,
+    config = function()
+      require('goto-preview').setup {
+        -- Default settings
+        width = 120, -- Width of the floating window
+        height = 30, -- Height of the floating window
+        border = { '↖', '─', '┐', '│', '┘', '─', '└', '│' }, -- Border characters of the floating window
+        default_mappings = false, -- Disable default mappings
+        debug = false, -- Enable debug logging
+        opacity = nil, -- 0-100 opacity level of the floating window where 100 is fully transparent.
+        resizing_mappings = false, -- Binds arrow keys to resizing the floating window.
+        -- Post open hook. You can use it to add custom highlights to the floating window
+        post_open_hook = nil,
+        -- Configure focus behavior
+        focus_on_open = true, -- Focus floating window when opened
+        -- Dismiss previews with filetype = "gotopreview" using standard close mappings
+        dismiss_on_move = false, -- Auto dismiss preview when cursor moves
+        -- Stack behavior
+        stack_floating_preview_windows = true, -- Whether to stack floating windows
+        preview_window_title = { enable = true, position = 'left' }, -- Whether to set the preview window title
+      }
+      -- Custom keymaps
+      vim.api.nvim_set_keymap('n', 'gpd', '<cmd>lua require("goto-preview").goto_preview_definition()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', 'gP', '<cmd>lua require("goto-preview").close_all_win()<CR>', { noremap = true, silent = true })
+      vim.keymap.set('n', '<C-v>', function()
+        vim.cmd 'wincmd L'
+        vim.wo.previewwindow = false
+      end, { silent = true })
     end,
   },
   -----------------------------------------------------------------------------
