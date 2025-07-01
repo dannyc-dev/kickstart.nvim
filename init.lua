@@ -487,7 +487,7 @@ require('lazy').setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>cA', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -772,6 +772,7 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'copilot' },
         },
       }
     end,
@@ -1082,6 +1083,39 @@ require('lazy').setup({
     -- order to load the plugin when the command is run for the first time
     keys = {
       { '<leader>lg', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
+    },
+  },
+
+  {
+    'olimorris/codecompanion.nvim',
+    dependencies = {
+      'github/copilot.vim', -- Using existing GitHub Copilot plugin
+      'nvim-lua/plenary.nvim',
+      'stevearc/dressing.nvim',
+    },
+    config = function()
+      require('codecompanion').setup {
+        model = {
+          provider = 'copilot', -- Use GitHub Copilot as the provider
+          name = 'claude-3-7-sonnet', -- Request Claude 3.7 Sonnet model
+        },
+        ui = {
+          input_window = {
+            border = 'rounded',
+          },
+          output_window = {
+            border = 'rounded',
+          },
+        },
+        keymaps = {
+          disable_defaults = { 'gr' },
+        },
+      }
+    end,
+    keys = {
+      { '<leader>cc', '<cmd>CodeCompanionChat<CR>', desc = 'Toggle Code Companion' },
+      { '<leader>ca', '<cmd>CodeCompanionActions<CR>', desc = 'Code Companion Action Palette' },
+      { '<leader>ci', '<cmd>CodeCompanion<CR>', desc = 'Code Companion Inline Assistant' },
     },
   },
 
